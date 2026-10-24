@@ -62,10 +62,15 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, opacity 0.2s;
         }
         button:hover {
             background-color: #fa5a68;
+        }
+        button:disabled {
+            background-color: #553338;
+            color: #aaa;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -109,14 +114,23 @@
                 return;
             }
 
+            // Мгновенная визуальная реакция на нажатие
+            let btn = this;
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            btn.textContent = '⏳ Запуск анализа...';
+
             let data = {
                 player: player,
                 weapon: weapon,
                 crouch: crouch
             };
 
-            tg.sendData(JSON.stringify(data));
-            tg.close();
+            // Небольшая пауза в 0.4 секунды, чтобы пользователь успел увидеть изменение кнопки
+            setTimeout(() => {
+                tg.sendData(JSON.stringify(data));
+                tg.close();
+            }, 400);
         });
     </script>
 </body>
