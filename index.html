@@ -3,96 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>kills_ai - Valorant Coach</title>
+    <title>kills_ai — Панель тренера</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             background-color: #0f1923;
             color: #ece8e1;
-            font-family: 'Segoe UI', sans-serif;
-            padding: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        h2 { color: #ff4655; margin-top: 0; }
-        .card {
-            background: #1f2326;
-            border: 1px solid #363b3e;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
-        }
-        label { display: block; margin-bottom: 6px; font-weight: bold; }
-        select, input {
+        .container {
             width: 100%;
-            padding: 10px;
-            border-radius: 4px;
+            max-width: 400px;
+            background: #1f2326;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             border: 1px solid #ff4655;
-            background: #0f1923;
+        }
+        h2 {
+            color: #ff4655;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #8b9bb4;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            background: #2b3137;
+            border: 1px solid #484f58;
+            border-radius: 6px;
             color: #fff;
+            font-size: 16px;
             box-sizing: border-box;
-            margin-bottom: 12px;
+        }
+        input:focus, select:focus {
+            border-color: #ff4655;
+            outline: none;
         }
         button {
             width: 100%;
-            background: #ff4655;
+            background-color: #ff4655;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 14px;
+            margin-top: 25px;
+            border-radius: 6px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
+            transition: background 0.2s;
         }
-        button:hover { background: #e03e4d; }
+        button:hover {
+            background-color: #fa5a68;
+        }
     </style>
 </head>
 <body>
-    <h2>🎯 kills_ai — Панель тренера</h2>
-
-    <div class="card">
-        <label for="player">Никнейм и тег (Player#TAG):</label>
+    <div class="container">
+        <h2>kills_ai / Панель</h2>
+        
+        <label for="player">Твой Riot ID (Ник#Тег):</label>
         <input type="text" id="player" placeholder="Например: Player#EU1">
 
-        <label for="weapon">Основное оружие:</label>
+        <label for="weapon">Основное оружие (если автоопределение не сработает):</label>
         <select id="weapon">
-            <option value="Vandal">🎯 Vandal</option>
-            <option value="Phantom">🎯 Phantom</option>
-            <option value="Guardian">🎯 Guardian</option>
-            <option value="Operator">🔭 Operator (Авик)</option>
-            <option value="Spectre">🔫 Spectre</option>
-            <option value="Other">🔄 Смешанный арсенал</option>
+            <option value="Vandal">Vandal</option>
+            <option value="Phantom">Phantom</option>
+            <option value="Operator">Operator</option>
+            <option value="Sheriff">Sheriff</option>
+            <option value="Смешанный арсенал">Смешанный арсенал</option>
         </select>
 
-        <label for="crouch">Привычка приседать:</label>
+        <label for="crouch">Как часто ты приседаешь в перестрелках?</label>
         <select id="crouch">
-            <option value="cr_Never">🚫 Вообще не сажусь</option>
-            <option value="cr_Sometimes">⚖️ Иногда (по ситуации)</option>
-            <option value="cr_Always">⬇️ Постоянно зажимаю Ctrl</option>
+            <option value="cr_Never">Вообще не приседаю</option>
+            <option value="cr_Sometimes" selected>Иногда (по ситуации)</option>
+            <option value="cr_Always">Зажимаю присед постоянно</option>
         </select>
+
+        <button id="submitBtn">Запустить ИИ-анализ</button>
     </div>
 
-    <button id="send-btn">Запросить разбор</button>
-
     <script>
-        const tg = window.Telegram.WebApp;
+        let tg = window.Telegram.WebApp;
         tg.expand();
 
-        document.getElementById('send-btn').addEventListener('click', () => {
-            const player = document.getElementById('player').value.trim();
-            const weapon = document.getElementById('weapon').value;
-            const crouch = document.getElementById('crouch').value;
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            let player = document.getElementById('player').value.trim();
+            let weapon = document.getElementById('weapon').value;
+            let crouch = document.getElementById('crouch').value;
 
-            if (!player.includes('#')) {
-                alert('Укажи корректный ник с тегом через решетку #!');
+            if (!player || !player.includes('#')) {
+                alert('Пожалуйста, введи корректный Riot ID (Ник#Тег)!');
                 return;
             }
 
-            // Отправляем данные обратно в бот
-            tg.sendData(JSON.stringify({
+            let data = {
                 player: player,
                 weapon: weapon,
                 crouch: crouch
-            }));
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
         });
     </script>
 </body>
